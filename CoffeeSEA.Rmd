@@ -1,0 +1,94 @@
+---
+title: "Coffee"
+author: "V Chikovskiy"
+date: "25 August 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Load required package   s
+library(rjson) # to manage json UN database
+#install.packages("countrycode")
+library(countrycode) # to access all country codes in different formats
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r setup UN Comtrade extract}
+get.Comtrade = function(url="http://comtrade.un.org/api/get?"
+                         ,maxrec=50000
+                         ,type="C"
+                         ,freq="A"
+                         ,px="HS"
+                         ,ps="now"
+                         ,r
+                         ,p
+                         ,rg="all"
+                         ,cc="TOTAL"
+                         ,fmt="json"
+)
+{
+  string<- paste(url
+                 ,"max=",maxrec,"&" #maximum no. of records returned
+                 ,"type=",type,"&" #type of trade (c=commodities)
+                 ,"freq=",freq,"&" #frequency
+                 ,"px=",px,"&" #classification
+                 ,"ps=",ps,"&" #time period
+                 ,"r=",r,"&" #reporting area
+                 ,"p=",p,"&" #partner country
+                 ,"rg=",rg,"&" #trade flow
+                 ,"cc=",cc,"&" #classification code
+                 ,"fmt=",fmt        #Format
+                 ,sep = ""
+  )
+  
+  if(fmt == "csv") {
+    raw.data<- read.csv(string,header=TRUE)
+    return(list(validation=NULL, data=raw.data))
+  } else {
+    if(fmt == "json" ) {
+      raw.data<- fromJSON(file=string)
+      data<- raw.data$dataset
+      validation<- unlist(raw.data$validation, recursive=TRUE)
+      ndata<- NULL
+      if(length(data)> 0) {
+        var.names<- names(data[[1]])
+        data<- as.data.frame(t( sapply(data,rbind)))
+        ndata<- NULL
+        for(i in 1:ncol(data)){
+          data[sapply(data[,i],is.null),i]<- NA
+          ndata<- cbind(ndata, unlist(data[,i]))
+        }
+        ndata<- as.data.frame(ndata)
+        colnames(ndata)<- var.names
+      }
+      return(list(validation=validation,data =ndata))
+    }
+  }
+}
+```
+
+## Load initial data
+
+You can also embed plots, for example:
+
+```{r Download the data for South East Asia, echo=FALSE}
+# Country codes for the SEA based on UN coding system
+SEA_list = c("SG", "VN", "TH", "PH")
+
+SEA_codes = countrycode(SEA_list, 'iso2c', 'un')
+SEA_codes = as.character(SEA_codes)
+SEA_codes = c("702", "764")
+SEA_list
+
+SEA_coffee = get.Comtrade(r="702", p="all", ps="2017", cc = "090111")
+SEA_coffee_df = SEA_coffee$data
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
