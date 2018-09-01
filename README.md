@@ -1,1 +1,3 @@
-# trade_analysis_with_RA line I wrote on my computer
+# Trade Analysis with R
+
+A brief introduction into investigation of UN Commtrade data.

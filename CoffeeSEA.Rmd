@@ -87,7 +87,7 @@ SEA_codes = as.character(SEA_codes)
 SEA_codes = c("702", "764")
 SEA_list
 
-SEA_coffee = get.Comtrade(r="702", p="all", ps="2017", cc = "090111")
+SEA_coffee = get.Comtrade(r="764", p="all", ps="2017", cc = "090111")
 SEA_coffee_df = SEA_coffee$data
 
 # VN code does not seem to work
