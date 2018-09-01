@@ -89,6 +89,8 @@ SEA_list
 
 SEA_coffee = get.Comtrade(r="702", p="all", ps="2017", cc = "090111")
 SEA_coffee_df = SEA_coffee$data
+
+# VN code does not seem to work
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
